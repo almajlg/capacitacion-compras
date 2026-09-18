@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flujo de Proceso de Compras</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .step-card {
+      transition: all 0.3s ease;
+    }
+    .step-card.active {
+      border-color: #2563eb;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15), 0 8px 10px -6px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
+    }
+    .connector-line {
+      transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-indigo-900 text-white py-6 px-4 shadow-md mb-8">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          <i data-lucide="shopping-cart" class="w-7 h-7 text-indigo-300"></i>
+          Proceso de Capacitación de Compras
+        </h1>
+        <p class="text-indigo-200 text-sm mt-1">Guía interactiva paso a paso para solicitudes en el portal Mi TEC</p>
+      </div>
+      <div class="bg-indigo-800/60 border border-indigo-700/50 rounded-lg px-4 py-2 text-xs text-indigo-200 flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-indigo-300 flex-shrink-0"></i>
+        <span>Haz clic en cada paso para ver los detalles e indicaciones específicas.</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4">
+    
+    <!-- Visual Progress Bar / Stepper -->
+    <div class="mb-8 overflow-x-auto pb-4">
+      <div class="flex items-center justify-between min-w-[650px] relative px-2">
+        <!-- Connecting Line Background -->
+        <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1 bg-slate-200 -z-0"></div>
+        <!-- Active Connecting Line -->
+        <div id="progress-line" class="absolute left-6 top-1/2 -translate-y-1/2 h-1 bg-indigo-600 transition-all duration-300 -z-0" style="width: 0%;"></div>
+
+        <!-- Step Indicators -->
+        <button onclick="goToStep(1)" class="step-btn group relative z-10 flex flex-col items-center gap-2 focus:outline-none" data-step="1">
+          <div class="step-icon w-12 h-12 rounded-full bg-white border-2 border-indigo-600 text-indigo-600 flex items-center justify-center font-bold shadow-sm transition-all group-hover:scale-105">
+            1
+          </div>
+          <span class="text-xs font-semibold text-slate-600 group-hover:text-indigo-600 transition-colors">Cotización & VoBo</span>
+        </button>
+
+        <button onclick="goToStep(2)" class="step-btn group relative z-10 flex flex-col items-center gap-2 focus:outline-none" data-step="2">
+          <div class="step-icon w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold shadow-sm transition-all group-hover:scale-105">
+            2
+          </div>
+          <span class="text-xs font-semibold text-slate-500 group-hover:text-indigo-600 transition-colors">Portal Mi TEC</span>
+        </button>
+
+        <button onclick="goToStep(3)" class="step-btn group relative z-10 flex flex-col items-center gap-2 focus:outline-none" data-step="3">
+          <div class="step-icon w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold shadow-sm transition-all group-hover:scale-105">
+            3
+          </div>
+          <span class="text-xs font-semibold text-slate-500 group-hover:text-indigo-600 transition-colors">Datos y Archivos</span>
+        </button>
+
+        <button onclick="goToStep(4)" class="step-btn group relative z-10 flex flex-col items-center gap-2 focus:outline-none" data-step="4">
+          <div class="step-icon w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold shadow-sm transition-all group-hover:scale-105">
+            4
+          </div>
+          <span class="text-xs font-semibold text-slate-500 group-hover:text-indigo-600 transition-colors">Aprobación</span>
+        </button>
+
+        <button onclick="goToStep(5)" class="step-btn group relative z-10 flex flex-col items-center gap-2 focus:outline-none" data-step="5">
+          <div class="step-icon w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold shadow-sm transition-all group-hover:scale-105">
+            5
+          </div>
+          <span class="text-xs font-semibold text-slate-500 group-hover:text-indigo-600 transition-colors">Cierre y Pago</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Step Cards Area -->
+    <div class="grid md:grid-cols-3 gap-6">
+      
+      <!-- Main Content (2 cols) -->
+      <div class="md:col-span-2">
+        <div id="step-content" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative min-h-[420px] flex flex-col justify-between">
+          <!-- Dynamically populated content -->
+        </div>
+      </div>
+
+      <!-- Side Card: Tips & Important Rules (1 col) -->
+      <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 flex flex-col justify-between shadow-sm">
+        <div>
+          <h3 class="text-base font-bold text-indigo-950 flex items-center gap-2 mb-3">
+            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i>
+            Reglas Clave del Proceso
+          </h3>
+          <ul id="step-rules" class="space-y-3 text-xs text-slate-700">
+            <!-- Dynamically populated rules -->
+          </ul>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-indigo-200/60">
+          <div class="flex items-center gap-2 text-indigo-900 font-semibold text-xs mb-1">
+            <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
+            Contactos Importantes
+          </div>
+          <p class="text-xs text-slate-600">
+            • <strong>Jocelyn:</strong> Proveedores complementarios.<br>
+            • <strong>Toño / Memo / Angélica:</strong> Vistos buenos y aprobaciones directas.<br>
+            • <strong>Claudia / Cloris:</strong> Aprobadoras en plataforma.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="flex justify-between items-center mt-6">
+      <button id="prev-btn" onclick="changeStep(-1)" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 font-medium text-sm flex items-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Anterior
+      </button>
+
+      <span id="step-counter" class="text-xs font-semibold text-slate-400">Paso 1 de 5</span>
+
+      <button id="next-btn" onclick="changeStep(1)" class="px-5 py-2.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-medium text-sm flex items-center gap-2 transition-all shadow-sm">
+        Siguiente <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+  </main>
+
+  <script>
+    const stepsData = {
+      1: {
+        title: "1. Cotizaciones y Visto Bueno (VoBo)",
+        subtitle: "Paso previo al ingreso de cualquier solicitud",
+        icon: "file-text",
+        badge: "Fase Previa",
+        details: [
+          "<strong>Obtener Cotizaciones:</strong> Recopila las opciones necesarias (normalmente 2 proveedores si supera $10,000 MXN).",
+          "<strong>Artículos fuera de catálogo:</strong> Si requieres insumos especiales (talleres, chisperos), solicita a <strong>Jocelyn</strong> los proveedores complementarios.",
+          "<strong>Búsqueda de papelería en Office:</strong> Para eventos, busca el SKU en la web de Office para anticipar el artículo.",
+          "<strong>Solicitud de VoBo:</strong> Envía correo a DCA, Dirección o Antonio con la recomendación/cuadro comparativo.",
+          "<strong>Guardar Evidencia:</strong> Conserva la captura o archivo `.eml` del correo con la autorización explicita."
+        ],
+        rules: [
+          "Sin visto bueno por escrito NO se puede iniciar la solicitud en sistema.",
+          "Siempre guarda las cotizaciones en formato PDF o imagen para adjuntarlas.",
+          "Asegúrate de justificar si solo se cotiza con un proveedor."
+        ]
+      },
+      2: {
+        title: "2. Búsqueda en Portal Mi TEC",
+        subtitle: "Ubicación e ingreso de productos/servicios",
+        icon: "search",
+        badge: "Plataforma Mi TEC",
+        details: [
+          "<strong>Acceso:</strong> Entra al portal institucional Mi TEC y busca el ícono del carrito naranja o la frase <em>'Mis Compras'</em>.",
+          "<strong>Ingreso al sistema:</strong> Haz clic en el enlace <em>'Ingresa aquí'</em> dentro del menú.",
+          "<strong>Búsqueda de artículos:</strong> Usa la barra superior para buscar tu insumo (ej. Alimentos, Papelería).",
+          "<strong>Precio Convenio:</strong> Al ingresar SKUs de papelería, el portal desplegará automáticamente la tarifa especial negociada por la institución.",
+          "<strong>Agregar al Carrito:</strong> Elige el ítem del catálogo general y da clic en <em>'Agregar al carrito'</em>."
+        ],
+        rules: [
+          "Catálogo general = Proveedores previamente dados de alta.",
+          "La papelería general de oficina se centraliza con 'G'. Solo pide directamente si es para un evento específico.",
+          "Verifica haber agregado la cantidad correcta antes de avanzar."
+        ]
+      },
+      3: {
+        title: "3. Llenado de Datos y Documentos",
+        subtitle: "Captura de justificación y anexos requeridos",
+        icon: "form-input",
+        badge: "Formulario",
+        details: [
+          "<strong>Nombre de solicitante:</strong> Confirma que aparezca tu nombre (cada usuario debe autogestionar sus solicitudes).",
+          "<strong>Justificación detallada:</strong> Redacta un texto claro y explícito (Ej. <em>'Box lunch para la Feria del Empleo Octubre 2026'</em>).",
+          "<strong>Subir Adjuntos:</strong> Carga las cotizaciones y el comprobante del visto bueno (correo/captura).",
+          "<strong>Texto Socio Comercial:</strong> Copia la misma justificación para que la lea el proveedor.",
+          "<strong>Campos obligatorios:</strong> Selecciona Tipo de Egreso = <em>'Gastos Operativos'</em> y en '¿Servicio o artículo recibido?' marca siempre <strong>NO</strong>."
+        ],
+        rules: [
+          "Siempre marca 'NO' en artículo recibido, ya que toda compra requiere aprobación previa.",
+          "Solo llena los campos marcados con asterisco rojo (*) obligatorio.",
+          "La información ingresada es la que revisarán los aprobadores."
+        ]
+      },
+      4: {
+        title: "4. Edición de Proveedor y Envíos",
+        subtitle: "Asignación de costos y flujo de aprobación",
+        icon: "check-square",
+        badge: "Revisión Final",
+        details: [
+          "<strong>Seleccionar Proveedor:</strong> Haz clic sobre el ítem en el carrito, elige la opción <em>'Otro'</em> y escribe el nombre real (ej. Blanca para cafetería).",
+          "<strong>Precaución Pedidos Especiales:</strong> Si pides insumos como pines para eventos, selecciona un proveedor que <strong>NO diga 'contratado'</strong>.",
+          "<strong>Verificar Centro de Costos (Seco):</strong> Asegúrate de seleccionar el 'Seco' correspondiente a tu área (Profesional, Nacional, etc.).",
+          "<strong>Validar Montos:</strong> Revisa que el costo coincida exactamente con la cotización aprobada.",
+          "<strong>Enviar:</strong> Da clic en <em>'Enviar para aprobación'</em>. El estatus cambiará a 'Pendiente de aprobación'."
+        ],
+        rules: [
+          "Cualquier ajuste de última hora se notifica vía correo por los aprobadores (Claudia/Cloris).",
+          "Revisa con detenimiento el Centro de Costos para evitar rechazos.",
+          "Guarda los cambios antes de enviar para evitar pérdidas de información."
+        ]
+      },
+      5: {
+        title: "5. Recepción, Cierre y Pago",
+        subtitle: "Confirmación final del bien o servicio recibido",
+        icon: "badge-check",
+        badge: "Cierre de Orden",
+        details: [
+          "<strong>Recepcionar Evento/Servicio:</strong> Una vez entregado el producto o finalizado el evento, ingresa nuevamente al pedido.",
+          "<strong>Evidencia Fotográfica:</strong> Toma una foto del producto entregado o del servicio brindado.",
+          "<strong>Sección Comentarios:</strong> Entra al pedido aprobatorio, ve a la sección de comentarios finales y escribe: <em>'Servicio recibido completo'</em>.",
+          "<strong>Adjuntar Foto:</strong> Sube la imagen como evidencia dentro de la sección de comentarios.",
+          "<strong>Liberación de Pago:</strong> Envía el comentario para que Finanzas/Aprobadores liberen el pago correspondiente al proveedor."
+        ],
+        rules: [
+          "Si no completas este paso, el proveedor no recibirá su pago y continuará requiriendo el estatus.",
+          "Asegúrate de que la foto sea clara e identifique el material recibido.",
+          "Este paso es indispensable para dar por concluido el ciclo de compra."
+        ]
+      }
+    };
+
+    let currentStep = 1;
+
+    function renderStep(step) {
+      const data = stepsData[step];
+      const contentEl = document.getElementById('step-content');
+      const rulesEl = document.getElementById('step-rules');
+      const counterEl = document.getElementById('step-counter');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+
+      // Update Main Content
+      contentEl.innerHTML = `
+        <div>
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                <i data-lucide="${data.icon}" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-800">${data.title}</h2>
+                <p class="text-xs text-slate-500">${data.subtitle}</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 text-[11px] font-semibold bg-indigo-100 text-indigo-700 rounded-full">
+              ${data.badge}
+            </span>
+          </div>
+
+          <div class="space-y-3 mt-4">
+            ${data.details.map(detail => `
+              <div class="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-1"></i>
+                <div>${detail}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="mt-6 pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+          <span>Capacitación Compras - Proceso Estándar</span>
+          <span>Paso ${step} de 5</span>
+        </div>
+      `;
+
+      // Update Side Rules
+      rulesEl.innerHTML = data.rules.map(rule => `
+        <li class="flex items-start gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
+          <span>${rule}</span>
+        </li>
+      `).join('');
+
+      // Update Counter & Controls
+      counterEl.innerText = `Paso ${step} de 5`;
+      prevBtn.disabled = step === 1;
+      
+      if (step === 5) {
+        nextBtn.innerHTML = `Finalizar <i data-lucide="check" class="w-4 h-4"></i>`;
+        nextBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        nextBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      } else {
+        nextBtn.innerHTML = `Siguiente <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        nextBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+        nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+      }
+
+      // Update Visual Stepper Dots & Line
+      const progressPercent = ((step - 1) / 4) * 100;
+      document.getElementById('progress-line').style.width = `${progressPercent}%`;
+
+      document.querySelectorAll('.step-btn').forEach(btn => {
+        const btnStep = parseInt(btn.getAttribute('data-step'));
+        const iconContainer = btn.querySelector('.step-icon');
+        const textSpan = btn.querySelector('span');
+
+        if (btnStep === step) {
+          iconContainer.className = "step-icon w-12 h-12 rounded-full bg-indigo-600 text-white font-bold shadow-md flex items-center justify-center transition-all scale-110";
+          textSpan.className = "text-xs font-bold text-indigo-700";
+        } else if (btnStep < step) {
+          iconContainer.className = "step-icon w-12 h-12 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center transition-all";
+          iconContainer.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i>`;
+          textSpan.className = "text-xs font-semibold text-slate-600";
+        } else {
+          iconContainer.className = "step-icon w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-400 font-bold flex items-center justify-center shadow-sm transition-all";
+          iconContainer.innerText = btnStep;
+          textSpan.className = "text-xs font-semibold text-slate-400";
+        }
+      });
+
+      // Re-initialize Lucide Icons
+      lucide.createIcons();
+    }
+
+    function goToStep(step) {
+      currentStep = step;
+      renderStep(currentStep);
+    }
+
+    function changeStep(delta) {
+      const newStep = currentStep + delta;
+      if (newStep >= 1 && newStep <= 5) {
+        currentStep = newStep;
+        renderStep(currentStep);
+      }
+    }
+
+    // Initial Render
+    document.addEventListener('DOMContentLoaded', () => {
+      renderStep(1);
+    });
+  </script>
+</body>
+</html>
